@@ -5,10 +5,8 @@ import os
 
 app = Flask(__name__)
 
-# ملف بيخزن بيانات العملاء
 LICENSES_FILE = "licenses.json"
 
-# لو الملف مش موجود، نعمله
 if not os.path.exists(LICENSES_FILE):
     with open(LICENSES_FILE, "w") as f:
         json.dump({}, f)
@@ -24,9 +22,6 @@ def save_licenses(data):
         json.dump(data, f, indent=2)
 
 
-# ===============================
-# نقطة التحقق - البرنامج بيسأل هنا
-# ===============================
 @app.route("/check", methods=["POST"])
 def check_license():
     data = request.json
@@ -42,11 +37,9 @@ def check_license():
 
     license = licenses[key]
 
-    # لو متوقف يدوياً
     if not license.get("active", True):
         return jsonify({"status": "blocked", "message": "اللايسنس اتوقف"}), 403
 
-    # لو عنده تاريخ انتهاء
     expiry = license.get("expiry")
     if expiry:
         expiry_date = datetime.strptime(expiry, "%Y-%m-%d")
@@ -56,20 +49,14 @@ def check_license():
     return jsonify({"status": "valid", "message": "شغال تمام"}), 200
 
 
-# ===============================
-# إضافة عميل جديد
-# ===============================
 @app.route("/add", methods=["POST"])
 def add_license():
     data = request.json
-    admin_password = data.get("password")
-
-    # باسورد المدير - غيره لباسورد خاص بيك
-    if admin_password != "MY_SECRET_PASSWORD":
+    if data.get("password") != "MY_SECRET_PASSWORD":
         return jsonify({"message": "مش مسموح"}), 403
 
     key = data.get("license_key")
-    expiry = data.get("expiry")  # مثال: "2025-12-31"
+    expiry = data.get("expiry")
     client_name = data.get("client_name", "")
 
     if not key:
@@ -87,9 +74,6 @@ def add_license():
     return jsonify({"message": "اتضاف بنجاح", "key": key}), 200
 
 
-# ===============================
-# إيقاف عميل
-# ===============================
 @app.route("/block", methods=["POST"])
 def block_license():
     data = request.json
@@ -108,9 +92,6 @@ def block_license():
     return jsonify({"message": "اتوقف بنجاح"}), 200
 
 
-# ===============================
-# تفعيل عميل تاني
-# ===============================
 @app.route("/unblock", methods=["POST"])
 def unblock_license():
     data = request.json
@@ -129,9 +110,6 @@ def unblock_license():
     return jsonify({"message": "اتفعّل بنجاح"}), 200
 
 
-# ===============================
-# عرض كل العملاء
-# ===============================
 @app.route("/list", methods=["POST"])
 def list_licenses():
     data = request.json
@@ -143,4 +121,5 @@ def list_licenses():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
