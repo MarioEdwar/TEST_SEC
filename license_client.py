@@ -3,7 +3,7 @@ import sys
 import os
 
 # ضع هنا رابط السيرفر بتاعك بعد ما ترفعه
-SERVER_URL = "https://YOUR_SERVER_URL/check"
+SERVER_URL = "https://attractive-charisma-production.up.railway.app/check"
 
 # المفتاح الخاص بالعميل ده - كل عميل عنده مفتاح مختلف
 LICENSE_KEY = "CLIENT_KEY_HERE"
